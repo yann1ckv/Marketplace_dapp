@@ -22,10 +22,12 @@ contract Escrow {
         CreateEscrow(_productId, _buyer, _seller);
     }
 
+    /* get info on the escrow that's created */
     function escrowInfo() public view returns (address, address, bool) {
         return (buyer, seller, fundsDisbursed);
     }
 
+    /* if buyer approves, release funds  */
     function releaseToSeller(address caller) public {
         require(!fundsDisbursed);
 
@@ -37,6 +39,7 @@ contract Escrow {
         }
     }
 
+    /* if the sale is not approved the funds get refunded to buyer */
     function refundToBuyer(address caller) public {
         require(!fundsDisbursed);
 

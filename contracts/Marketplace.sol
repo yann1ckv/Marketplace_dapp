@@ -28,6 +28,8 @@ contract Marketplace {
     event NewProduct(uint _productId, string _name, string _category, string _imageLink, string _descLink,
         uint _startPrice, uint _productCondition);
 
+    event NewBid(address _bidder, uint _productId, uint _amount);
+
     struct Product {
         uint id;
         string name;
@@ -76,7 +78,7 @@ contract Marketplace {
     struct Bid {
         address bidder;
         uint productId;
-        uint value;
+        uint amount;
     }
 
     /* bid on a product */
@@ -95,6 +97,8 @@ contract Marketplace {
 
         product.totalBids += 1;
 
+        NewBid(msg.sender, _productId, msg.value);
+
         return true;
     }
 
@@ -112,10 +116,10 @@ contract Marketplace {
 
     /* close the auction */
     function closeAuction(uint _productId) public {
-        Product memory product = stores[productIdInStore[_productId]][_productId];
+        Product storage product = stores[productIdInStore[_productId]][_productId];
 
+        require(productIdInStore[_productId] == msg.sender);
         require(product.status == ProductStatus.Open);
-
 
         if (product.totalBids == 0) {
             product.status = ProductStatus.Unsold;
@@ -128,6 +132,14 @@ contract Marketplace {
             product.status = ProductStatus.Sold;
 
         }
+    }
+
+    function sendToEscrow(uint _productId) {
+        Product memory product = stores[productIdInStore[_productId]][_productId];
+
+        require(product.highestBidder == msg.sender);
+
+
     }
 
     /* get the escrow contract address for a product */

@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 
 mongoose.Promise = global.Promise;
 
+const BidSchema = new Schema({
+    amount: Number,
+    bidder: String
+})
 
 const ProductSchema = new Schema({
     blockchainId: Number,
@@ -11,9 +15,10 @@ const ProductSchema = new Schema({
     ipfsImageHash: String,
     ipfsDescHash: String,
     price: Number,
+    bids: [BidSchema],
     condition: Number,
     productStatus: Number
-});
+})
 
 const ProductModel = mongoose.model('ProductModel', ProductSchema);
 

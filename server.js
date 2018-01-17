@@ -61,6 +61,7 @@ function saveProduct(product) {
             ipfsImageHash: product._imageLink,
             ipfsDescHash: product._descLink,
             price: product._startPrice,
+            bids: [],
             condition: product._productCondition,
             productStatus: 0
         });
@@ -78,8 +79,54 @@ function saveProduct(product) {
     })
 }
 
-app.get('/', function(req, res) {
-    res.send('Hello World!')
+// listens to when a new bid gets added to the blockchain
+function bidEventListener() {
+    let bidEvent;
+    Marketplace.deployed().then(function(i) {
+        bidEvent = i.NewBid({
+            fromBlock: 0,
+            toBlock: 'latest'
+        })
+
+        bidEvent.watch(function(err, result) {
+            if (err) {
+                console.log(err)
+                return
+            }
+            saveBid(result.args)
+        })
+    })
+}
+
+bidEventListener()
+
+// save bid to mongodb
+function saveBid(product) {
+    let amount = parseInt(product._amount.toLocaleString())
+    let bid = {
+        amount: amount,
+        bidder: product._bidder
+    }
+    ProductModel.findOneAndUpdate({
+        'blockchainId': product._productId.toLocaleString()
+    }, {
+        $push: { bids: bid }
+    }, {
+        new : true
+    },
+    function(err, model) {
+        if (err) {
+            console.log(err)
+        }
+    })
+}
+
+app.get('/product', function(req, res) {
+    ProductModel.findOne({
+        blockchainId: req.query.productId
+    }, function(err, product) {
+        res.send(product)
+    })
 })
 
 app.get('/products', function(req, res) {
@@ -102,7 +149,6 @@ app.get('/products', function(req, res) {
     }
 
     ProductModel.find(query, null, {}, function(err, items) {
-        console.log(items.length);
         res.send(items);
     })
 })

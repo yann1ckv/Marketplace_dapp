@@ -62,6 +62,7 @@ window.App = {
             let amount = $("#bid-amount").val();
             let productId = $("#product-id").val();
             // insert bid into contract
+            console.log(amount + ' for ' + productId + ' by ' + web3.eth.accounts[0])
             Marketplace.deployed().then(function(i) {
                 i.bid(parseInt(productId), {
                     value: web3.toWei(amount),
@@ -78,6 +79,29 @@ window.App = {
             event.preventDefault();
         });
 
+        $("#close-auction").submit(function(event) {
+            $("#msg").hide();
+            let productId = $("#product-id").val()
+            Marketplace.deployed().then(function(i) {
+                i.closeAuction(parseInt(productId), {
+                    from: web3.eth.accounts[0],
+                    gas: 4400000
+                }).then(
+                    function(f) {
+                        $("#msg").show();
+                        $("#msg").html("The auction has been closed.");
+                        console.log(f)
+                        location.reload();
+                    }
+                ).catch(function(e) {
+                    console.log(e);
+                    $("#msg").show();
+                    $("#msg").html("The auction can only be closed by the owner of the auction");
+                })
+            });
+            event.preventDefault();
+        });
+
         if ($("#product-details").length > 0) {
             //This is product details page
             let productId = new URLSearchParams(window.location.search).get('product-id');
@@ -86,52 +110,75 @@ window.App = {
     }
 };
 
+// render single product on page
 function renderProductDetails(productId) {
-    Marketplace.deployed().then(function(i) {
-        i.getProduct.call(productId).then(function(p) {
-            let content = "";
-            ipfs.cat(p[4]).then(function(stream) {
-                content += stream.toString()
-                $("#product-desc").append("<div>" + content + "</div>");
-            }).catch(err => console.log(err))
+    $.ajax({
+        url: offchainServer + "/product",
+        type: 'get',
+        contentType: "application/json; charset=utf-8",
+        data: {
+            productId: productId
+        }
+    }).done(function(response) {
+        let content = "";
+        ipfs.cat(response.ipfsDescHash).then(function(stream) {
+            content += stream.toString()
+            $("#product-desc").append("<div>" + content + "</div>");
+        }).catch(err => console.log(err))
 
-            $("#product-image").append("<img src='https://ipfs.io/ipfs/" + p[3] + "' width='250px' />");
-            $("#product-price").html(displayPrice(p[5]));
-            $("#product-name").html(p[1]);
-            $("#product-id").val(p[0].toLocaleString());
-            $("#close-auction").hide();
-            $("#total-bids").append("<p>" + p[8] + "</p>")
-            $("#highest-bid").append("<p>" + p[9] + "</p>")
+        $("#product-image").append("<img src='https://ipfs.io/ipfs/" + response.ipfsImageHash + "' width='250px' />");
+        $("#product-price").html(displayPrice(response.price));
+        $("#product-name").html(response.name);
+        $("#product-id").val(response.blockchainId);
+        $("#close-auction").hide();
+        $("#total-bids").append("<p>" + response.bids.length + "</p>")
 
-            if (parseInt(p[6].toLocaleString()) == 1) {
-                Marketplace.deployed().then(function(i) {
-                    $("#escrow-info").show();
-                    i.highestBidderInfo.call(productId).then(function(f) {
-                        if (f[2].toLocaleString() == '0') {
-                            $("#product-status").html("Auction has ended. No bids were revealed");
-                        } else {
-                            $("#product-status").html("Auction has ended. Product sold to " + f[0] + " for " + displayPrice(f[2]) +
-                                "The money is in the escrow. Two of the three participants (Buyer, Seller and Arbiter) have to " +
-                                "either release the funds to seller or refund the money to the buyer");
-                        }
-                    })
-                    i.escrowInfo.call(productId).then(function(f) {
-                        $("#buyer").html('Buyer: ' + f[0]);
-                        $("#seller").html('Seller: ' + f[1]);
-                        if (f[2] == true) {
-                            $("#release-count").html("Amount from the escrow has been released");
-                        }
-                    })
-                }).catch(err => console.log(err))
-            } else if (parseInt(p[6].toLocaleString()) == 2) {
-                $("#product-status").html("Product was not sold");
-            } else {
-                $("#close-auction").show();
-            }
+        // loop for highest bid
+        let data = response.bids
+        let max_bid = Math.max(...data.map(o => o.amount));
+
+        if (max_bid == "-Infinity") {
+            max_bid = "No bids yet"
+        }
+
+        $("#highest-bid").append("<p>" + max_bid + "</p>")
+
+        Marketplace.deployed().then(function(j) {
+            j.getProduct.call(productId).then(function(p) {
+                if (parseInt(p[6].toLocaleString()) == 1) {
+                    Marketplace.deployed().then(function(i) {
+                        i.highestBidderInfo.call(productId).then(function(f) {
+                            $("#escrow-info").html(`Auction has ended. Product sold to ${f[0]} for ${displayPrice(f[1])}`)
+                        })
+                        i.escrowInfo.call(productId).then(function(q) {
+                            console.log(q)
+                            $("#buyer").html('Buyer: ' + q[0]);
+                            $("#seller").html('Seller: ' + q[1]);
+                            if (q[2] == false) {
+                                if (q[0] == web3.eth.accounts[0]) {
+                                    console.log('you are the buyer and you\'ve bought the product, now it\'s time to pay up!')
+                                } else {
+                                    console.log('you are the seller!')
+                                }
+                            }
+
+                            if (q[2] == true) {
+                                $("#release-count").html("Amount from the escrow has been released");
+                            }
+                        })
+                    }).catch(err => console.log(err))
+                } else if (parseInt(p[6].toLocaleString()) == 2) {
+                    $("#product-status").html("Product was not sold");
+                } else {
+                    console.log('nog niet verkocht')
+                    $("#close-auction").show();
+                }
+            })
         })
     })
 }
 
+// funds go from escrow contract to seller
 $("#release-funds").click(function() {
     let productId = new URLSearchParams(window.location.search).get('id');
     Marketplace.deployed().then(function(f) {
@@ -149,6 +196,7 @@ $("#release-funds").click(function() {
     });
 });
 
+// funds go from escrow contract back to buyer
 $("#refund-funds").click(function() {
     let productId = new URLSearchParams(window.location.search).get('id');
     Marketplace.deployed().then(function(f) {
@@ -163,18 +211,17 @@ $("#refund-funds").click(function() {
             console.log(e);
         })
     });
-
     alert("refund the funds!");
 });
 
 function renderStore() {
-    renderProducts("product-list", {}); // renderProducts("product-list", {});
-
+    renderProducts("product-list", {});
     categories.forEach(function(value) {
         $("#categories").append("<div>" + value + "");
     })
 }
 
+// render the productpage
 function renderProducts(div, filters) {
     $.ajax({
         url: offchainServer + "/products",
@@ -201,16 +248,14 @@ function renderProducts(div, filters) {
 }
 
 function buildProduct(product) {
-    let node = $("<div/>");
-    node.addClass("col-sm-3 text-center col-margin-bottom-1");
+    let node = $("<div/>")
+    node.addClass("col-sm-3 text-center col-margin-bottom-1")
     node.append(
         "<img src='https://ipfs.io/ipfs/" + product.ipfsImageHash + "' width='150px' />"
     );
-    node.append("<div>" + product.name + "</div>");
-    node.append("<div>" + product.blockchainId + "</div>");
-    node.append("<div>" + product.category + "</div>");
-    node.append("<div>" + product.condition + "</div>");
-    node.append("<div>Ether " + product.price + "</div>");
+    node.append("<div>" + product.name + "</div>")
+    node.append("<div>Price: " + product.price + "</div>")
+    node.append("<div>" + product.category + "</div>")
     node.append("<div><a href='product.html?product-id=" + product.blockchainId + "'>Details</a></div>")
     return node;
 }
@@ -221,7 +266,6 @@ function saveImageOnIpfs(reader) {
         const buffer = Buffer.from(reader.result);
         ipfs.add(buffer)
             .then((response) => {
-                console.log(response)
                 resolve(response[0].hash);
             }).catch((err) => {
                 console.error(err)
@@ -236,7 +280,6 @@ function saveTextOnIpfs(blob) {
         const descBuffer = Buffer.from(blob, 'utf-8');
         ipfs.add(descBuffer)
             .then((response) => {
-                console.log(response)
                 resolve(response[0].hash);
             }).catch((err) => {
                 console.error(err)
@@ -259,8 +302,7 @@ function saveProduct(reader, decodedParams) {
 
 // Save the whole product on the blockchain
 function saveProductToBlockchain(params, imageId, descId) {
-    console.log(params);
-
+    console.log(params["product-condition"])
     Marketplace.deployed().then(function(i) {
         // add the product using the paramaters and hashes for ipfs
         i.addProduct(params["product-name"], params["product-category"], imageId, descId,
@@ -275,29 +317,7 @@ function saveProductToBlockchain(params, imageId, descId) {
     });
 }
 
-$("#close-auction").submit(function(event) {
-    $("#msg").hide();
-    let productId = $("#product-id").val();
-    Marketplace.deployed().then(function(i) {
-        i.closeAuction(parseInt(productId), {
-            from: web3.eth.accounts[2],
-            gas: 4400000
-        }).then(
-            function(f) {
-                $("#msg").show();
-                $("#msg").html("The auction has been finalized and winner declared.");
-                console.log(f)
-                location.reload();
-            }
-        ).catch(function(e) {
-            console.log(e);
-            $("#msg").show();
-            $("#msg").html("The auction can not be finalized by the buyer or seller, only a third party aribiter can finalize it");
-        })
-    });
-    event.preventDefault();
-});
-
+// convert from Wei to Ether
 function displayPrice(amt) {
     return 'Ξ' + web3.fromWei(amt, 'ether');
 }
