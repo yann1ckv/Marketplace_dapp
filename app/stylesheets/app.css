@@ -1,0 +1,136 @@
+.col-margin-bottom-1 {
+    margin-bottom: 1em;
+}
+
+a {
+    cursor: pointer;
+}
+
+.navbar.main {
+    background: #5f6d7f;
+    color: white;
+}
+
+.navbar.main .list.nav-link {
+    background: #01bf86;
+}
+
+.navbar.main a {
+    color: white;
+}
+
+.navbar ul {
+    list-style: none;
+}
+
+.side-bar.col-sm-2 {
+    margin-left: 1em;
+    border-right: 1px solid #5f6d7f;
+}
+
+#product-list.row {
+    margin-left: 0;
+}
+
+#product-list .row, #product-finalize-list {
+    margin-top: 2em;
+}
+
+.row h2, .categories a, #categories a {
+    color: #5f6d7f;
+}
+
+#product-list a, #product-reveal-list a, #product-list .row>div {
+    color: #01bf86;
+}
+
+.container-fluid .row {
+    margin-left: 0px;
+}
+
+#product-list img, #product-reveal-list img, #product-finalize-list img {
+    width: 150px;
+    height: 150px;
+}
+
+.container-fluid .title {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 1em;
+}
+
+#product-list .details, .container-fluid .title, #product-finalize-list a {
+    color: #5f6d7f;
+}
+
+.product .details {
+    text-decoration: underline;
+}
+
+.time {
+    font-style: italic;
+}
+
+#product-finalize-list .row>div {
+    color: #e76e6e;
+}
+
+#product-details-page {
+    color: #5f6d7f;
+    background-color: #e9ebef;
+}
+
+#product-details-page h4 {
+    margin-top: 0px;
+    font-size: 20px;
+}
+
+#product-details-page h4.align {
+    margin-left: 15px;
+    font-style: italic;
+}
+
+#product-details-page #product-price {
+    color: #01bf86;
+}
+
+#product-details-page .bid-details, #product-details-page #product-desc {
+    padding: 2em;
+}
+
+#product-details-page #product-image {
+    padding: 2em 1em;
+    /*border: 1px solid #b2bcc8;*/
+    border-radius: 10px;
+    background-color: white;
+}
+
+#product-details-page h1 {
+    color: #5f6d7f;
+}
+
+#product-details-page h2.product-name {
+    color: #01bf86;
+    margin-top: 0;
+    margin-bottom: 1em
+    /*font-size: 1.5em;*/
+}
+
+#product-details-page #product-auction-end {
+    color: #e76e6e;
+    font-style: italic;
+    font-size: 17px;
+}
+
+#product-details-page #product-reveal {
+    margin-top: 3em;
+}
+
+#product-details-page button.form-submit {
+    background-color: #01bf86;
+    color: white;
+}
+
+#product-details-page #product-desc {
+    padding: 2em;
+}

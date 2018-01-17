@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Ethereum Marketplace</title>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="./app.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center">Product Details</h1>
+        <div class="container">
+            <div class="row" id="product-details">
+                <div style="display: none;" class="alert alert-success" id="msg"></div>
+                <div class="col-sm-12">
+                    <div class="col-sm-4">
+                        <div id="product-image"></div>
+                        <div id="product-name"></div>
+                    </div>
+                    <div class="col-sm-3">
+                        <h3 id="total-bids">Total number of bids:</h4>
+                        <h4 id="highest-bid">Current highest bid:</h3>
+                    </div>
+                    <div class="col-sm-5">
+                        <h3>Start bidding from: <span id="product-price"></span></h3>
+                        <form id="bidding" class="col-sm-4">
+                            <h4>Your Bid</h4>
+                            <div class="form-group">
+                                <label for="bid-amount">Enter Bid Amount</label>
+                                <input type="text" class="form-control" name="bid-amount" id="bid-amount" placeholder="Amount > Start Price" required="required">
+                            </div>
+                            <input type="hidden" name="product-id" id="product-id" />
+                            <button type="submit" class="btn btn-primary">Make a bid!</button>
+                        </form>
+                    </div>
+                </div>
+                <div id="product-desc" class="col-sm-12">
+                    <h2>Product Description</h2>
+                </div>
+            </div>
+            <form id="close-auction" class="col-sm-6">
+                <input type="hidden" name="product-id" id="product-id" />
+                <button type="submit" class="btn form-submit">Close auction</button>
+            </form>
+            <div id="product-status">
+                <div id="escrow-info"></div>
+                <div id="buyer"></div>
+                <div id="seller"></div>
+                <a id="release-funds" class="btn form-submit">Release Amount to Seller</a>
+                <a id="refund-funds" class="btn form-submit">Refund Amount to Buyer</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
