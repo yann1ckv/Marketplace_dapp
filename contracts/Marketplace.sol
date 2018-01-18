@@ -82,22 +82,22 @@ contract Marketplace {
     }
 
     /* bid on a product */
-    function bid(uint _productId) public payable returns (bool) {
+    function bid(uint _productId, uint _amount) public payable returns (bool) {
         Product storage product = stores[productIdInStore[_productId]][_productId];
 
-        require(msg.value > product.startPrice && msg.value > product.highestBid);
+        require(_amount > product.startPrice && _amount > product.highestBid);
         require(product.bids[msg.sender].bidder == 0);
 
-        if (msg.value > product.highestBid) {
-            product.highestBid = msg.value;
+        if (_amount > product.highestBid) {
+            product.highestBid = _amount;
             product.highestBidder = msg.sender;
         }
 
-        product.bids[msg.sender] = Bid(msg.sender, _productId, msg.value);
+        product.bids[msg.sender] = Bid(msg.sender, _productId, _amount);
 
         product.totalBids += 1;
 
-        NewBid(msg.sender, _productId, msg.value);
+        NewBid(msg.sender, _productId, _amount);
 
         return true;
     }
@@ -130,7 +130,7 @@ contract Marketplace {
     }
 
     /* if you are the buyer and highestbidder and the contract has been closed, you send the money to the escrow */
-    function sendToEscrow(uint _productId) public {
+    function sendToEscrow(uint _productId) public payable {
         Product memory product = stores[productIdInStore[_productId]][_productId];
 
         var contractOwner = productIdInStore[_productId];
@@ -138,7 +138,7 @@ contract Marketplace {
         require(product.highestBidder == msg.sender);
         require(product.status == ProductStatus.Sold);
 
-        Escrow escrow = (new Escrow).value(product.highestBid)(_productId, msg.sender, contractOwner);
+        Escrow escrow = (new Escrow).value(msg.value)(_productId, msg.sender, contractOwner);
         productEscrow[_productId] = address(escrow);
     }
 

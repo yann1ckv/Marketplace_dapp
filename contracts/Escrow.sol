@@ -9,8 +9,6 @@ contract Escrow {
     bool public fundsDisbursed;
 
     event CreateEscrow(uint _productId, address _buyer, address _seller);
-    event UnlockAmount(uint _productId, string _operation, address _operator);
-    event DisburseAmount(uint _productId, uint _amount, address _beneficiary);
 
     /* constructor that creates the escrow contract */
     function Escrow(uint _productId, address _buyer, address _seller) public payable {
@@ -30,24 +28,18 @@ contract Escrow {
     /* if buyer approves, release funds  */
     function releaseToSeller(address caller) public {
         require(!fundsDisbursed);
+        require(caller == buyer);
 
-        if (caller == buyer) {
-            UnlockAmount(productId, "release", caller);
-            seller.transfer(amount);
-            fundsDisbursed = true;
-            DisburseAmount(productId, amount, seller);
-        }
+        seller.transfer(amount);
+        fundsDisbursed = true;
     }
 
     /* if the sale is not approved the funds get refunded to buyer */
     function refundToBuyer(address caller) public {
         require(!fundsDisbursed);
-
-        if (caller == seller) {
-            UnlockAmount(productId, "refund", caller);
-            buyer.transfer(amount);
-            fundsDisbursed = true;
-            DisburseAmount(productId, amount, buyer);
-        }
+        require(caller == seller);
+        
+        buyer.transfer(amount);
+        fundsDisbursed = true;
     }
 }

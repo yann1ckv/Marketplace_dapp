@@ -23,116 +23,156 @@ const ipfs = ipfsAPI({
     host: 'localhost',
     port: '5001',
     protocol: 'http'
-});
+})
 
 // server to make calls to, so that the offchain data can be retrieved
-const offchainServer = "http://localhost:3000";
+const offchainServer = "http://localhost:3000"
 const categories = ["Art", "Books", "Cameras", "Cell Phones & Accessories", "Clothing", "Computers & Tablets", "Gift Cards & Coupons",
     "Musical Instruments & Gear", "Pet Supplies", "Pottery & Glass", "Sporting Goods", "Tickets", "Toys & Hobbies", "Video Games"
-];
+]
 
-window.App = {
-    start: function() {
-        var self = this;
+import defaultExport from "./module1a.js"
 
-        Marketplace.setProvider(web3.currentProvider);
-        renderStore();
-
-        var reader;
-
-        $("#product-image").change(function(event) {
-            const file = event.target.files[0]
-            reader = new window.FileReader()
-            reader.readAsArrayBuffer(file)
-        });
-
-        $("#add-item-to-store").submit(function(event) {
-            const req = $("#add-item-to-store").serialize();
-            let params = JSON.parse('{"' + req.replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}');
-            let decodedParams = {}
-            Object.keys(params).forEach(function(v) {
-                decodedParams[v] = decodeURIComponent(decodeURI(params[v]));
-            });
-            saveProduct(reader, decodedParams);
-            event.preventDefault();
-        });
-
-        $("#bidding").submit(function(event) {
-            $("#msg").hide();
-            let amount = $("#bid-amount").val();
-            let productId = $("#product-id").val();
-            // insert bid into contract
-            console.log(amount + ' for ' + productId + ' by ' + web3.eth.accounts[0])
-            Marketplace.deployed().then(function(i) {
-                i.bid(parseInt(productId), {
-                    value: web3.toWei(amount),
-                    from: web3.eth.accounts[0],
-                    gas: 440000
-                }).then(
-                    function(f) {
-                        $("#msg").html("Your bid has been successfully submitted!");
-                        $("#msg").show();
-                        console.log(f)
-                    }
-                )
-            });
-            event.preventDefault();
-        });
-
-        $("#close-auction").submit(function(event) {
-            $("#msg").hide();
-            let productId = $("#product-id").val()
-            Marketplace.deployed().then(function(i) {
-                i.closeAuction(parseInt(productId), {
-                    from: web3.eth.accounts[0],
-                    gas: 4400000
-                }).then(
-                    function(f) {
-                        $("#msg").show();
-                        $("#msg").html("The auction has been closed.");
-                        console.log(f)
-                        location.reload();
-                    }
-                ).catch(function(e) {
-                    console.log(e);
-                    $("#msg").show();
-                    $("#msg").html("The auction can only be closed by the owner of the auction");
-                })
-            });
-            event.preventDefault();
-        })
-
-        $("#escrow-send").click(function() {
-            let productId = $("#product-id").val()
-            Marketplace.deployed().then(function(i) {
-                i.getProduct.call(parseInt(productId)).then(function(p) {
-                    console.log(p[9].toLocaleString())
-                    i.sendToEscrow(parseInt(productId), {
-                        // value: p[9].toLocaleString(),
-                        from: web3.eth.accounts[0],
-                        gas: 4400000
-                    }).then(
-                        function(f) {
-                            console.log(f)
-                        }
-                    )
-                })
-                i.escrowAddresForProduct.call(parseInt(productId)).then(function(p) {
-                    web3.eth.getBalance(p, function(err, result) {
-                        console.log(p)
-                        // console.log(result.toLocaleString())
-                    })
-                })
-            })
-        })
-
-        if ($("#product-details").length > 0) {
-            //This is product details page
-            let productId = new URLSearchParams(window.location.search).get('product-id');
-            renderProductDetails(productId);
-        }
-    }
-};
+// window.App = {
+//     start: function() {
+//         var self = this;
+//
+//         Marketplace.setProvider(web3.currentProvider);
+//         renderStore();
+//
+//         var reader;
+//
+//         $("#product-image").change(function(event) {
+//             const file = event.target.files[0]
+//             reader = new window.FileReader()
+//             reader.readAsArrayBuffer(file)
+//         });
+//
+//         $("#add-item-to-store").submit(function(event) {
+//             const req = $("#add-item-to-store").serialize();
+//             let params = JSON.parse('{"' + req.replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}')
+//             let decodedParams = {}
+//             Object.keys(params).forEach(function(v) {
+//                 decodedParams[v] = decodeURIComponent(decodeURI(params[v]))
+//             });
+//             saveProduct(reader, decodedParams)
+//             event.preventDefault()
+//         });
+//
+//         $("#bidding").submit(function(event) {
+//             $("#msg").hide();
+//             let amount = $("#bid-amount").val()
+//             let productId = $("#product-id").val()
+//             // insert bid into contract
+//             console.log(amount + ' for ' + productId + ' by ' + web3.eth.accounts[0])
+//             Marketplace.deployed().then(function(i) {
+//                 let bid = web3.toWei(amount)
+//                 i.bid(parseInt(productId), bid, {
+//                     from: web3.eth.accounts[0],
+//                     gas: 440000
+//                 }).then(
+//                     function(f) {
+//                         $("#msg").html("Your bid has been successfully submitted!")
+//                         $("#msg").show()
+//                         console.log(f)
+//                     }
+//                 )
+//             })
+//             event.preventDefault()
+//         });
+//
+//         $("#close-auction").submit(function(event) {
+//             $("#msg").hide()
+//             let productId = $("#product-id").val()
+//             Marketplace.deployed().then(function(i) {
+//                 i.closeAuction(parseInt(productId), {
+//                     from: web3.eth.accounts[0],
+//                     gas: 4400000
+//                 }).then(
+//                     function(f) {
+//                         $("#msg").show()
+//                         $("#msg").html("The auction has been closed.")
+//                         console.log(f)
+//                         location.reload()
+//                     }
+//                 ).catch(function(e) {
+//                     console.log(e)
+//                     $("#msg").show()
+//                     $("#msg").html("The auction can only be closed by the owner of the auction")
+//                 })
+//             });
+//             event.preventDefault()
+//         })
+//
+//         $("#escrow-send").click(function() {
+//             let productId = $("#product-id").val()
+//             Marketplace.deployed().then(function(i) {
+//                 i.getProduct.call(parseInt(productId)).then(function(p) {
+//                     let bid = p[9].toLocaleString()
+//                     console.log(bid)
+//                     i.sendToEscrow(parseInt(productId), {
+//                         value: bid,
+//                         from: web3.eth.accounts[0],
+//                         gas: 4400000
+//                     }).then(
+//                         function(f) {
+//                             $("#msg").show()
+//                             $("#msg").html("You've sent money to the escrow contract.")
+//                             console.log(f)
+//                         }
+//                     )
+//                 })
+//                 i.escrowAddresForProduct.call(parseInt(productId)).then(function(p) {
+//                     web3.eth.getBalance(p, function(err, result) {
+//                         console.log(result)
+//                     })
+//                 })
+//             })
+//         })
+//
+//         if ($("#product-details").length > 0) {
+//             //This is product details page
+//             let productId = new URLSearchParams(window.location.search).get('product-id')
+//             renderProductDetails(productId)
+//         }
+//
+//         // funds go from escrow contract to seller
+//         $("#release-funds").click(function() {
+//             console.log('release')
+//             let productId = new URLSearchParams(window.location.search).get('id')
+//             Marketplace.deployed().then(function(f) {
+//                 $("#msg").html("Your transaction has been submitted. Please wait for few seconds for the confirmation").show()
+//                 f.releaseToSeller(productId, {
+//                     from: web3.eth.accounts[0],
+//                     gas: 440000
+//                 }).then(function(f) {
+//                     console.log(f)
+//                     location.reload()
+//                 }).catch(function(err) {
+//                     console.log(err)
+//                 })
+//             })
+//         })
+//
+//         // funds go from escrow contract back to buyer
+//         $("#refund-funds").click(function() {
+//             console.log('refund')
+//             let productId = new URLSearchParams(window.location.search).get('id')
+//             Marketplace.deployed().then(function(f) {
+//                 $("#msg").html("Your transaction has been submitted. Please wait for few seconds for the confirmation").show()
+//                 f.refundToBuyer(productId, {
+//                     from: web3.eth.accounts[0],
+//                     gas: 440000
+//                 }).then(function(f) {
+//                     console.log(f)
+//                     location.reload()
+//                 }).catch(function(err) {
+//                     console.log(err)
+//                 })
+//             })
+//         })
+//     }
+// };
 
 // render single product on page
 function renderProductDetails(productId) {
@@ -171,81 +211,46 @@ function renderProductDetails(productId) {
             j.getProduct.call(productId).then(function(p) {
                 if (parseInt(p[6].toLocaleString()) == 1) {
                     j.highestBidderInfo.call(productId).then(function(f) {
-                        $("#escrow-info").html(`Auction has ended. Product sold to ${f[0]} for ${displayPrice(f[1])}`)
-                        if (f[0] == web3.eth.accounts[0]) {
-                            console.log('You are the buyer, do you want to send money to the escrow?')
-                            $('#escrow-send').append('<a id="send-to-escrow" class="btn form-submit">Send amount to escrow contract!</a>')
-                        }
-                    })
-
-                        // i.escrowInfo.call(productId).then(function(q) {
-                            // console.log(q)
-                            // $("#buyer").html('Buyer: ' + q[0]);
-                            // $("#seller").html('Seller: ' + q[1]);
-                            // if (q[2] == false) {
-                            //     if (q[0] == web3.eth.accounts[0]) {
-                            //         console.log('you are the buyer and you\'ve bought the product, now it\'s time to pay up!')
-                            //         $('#escrow-send').append('<a id="send-to-escrow" class="btn form-submit">Send amount to escrow contract!</a>')
-                            //     }
-                            //     // if (q[0] == web3.eth.accounts[0]) {
-                            //     //     console.log('you are the buyer and you\'ve bought the product, now it\'s time to pay up!')
-                            //     //     $('#release-refund').html('<a id="release-funds" class="btn form-submit">Release Amount to Seller</a>')
-                            //     // } else {
-                            //     //     console.log('you are the seller!')
-                            //     //     $('#release-refund').html('<a id="refund-funds" class="btn form-submit">Refund Amount to Buyer</a>')
-                            //     // }
-                            // }
-                            //
-                            // if (q[2] == true) {
-                            //     $("#release-count").html("Amount from the escrow has been released");
-                            // }
-                        // }).catch(err => console.log(err))
+                        j.escrowAddresForProduct.call(productId).then(function(p) {
+                            $("#escrow-info").html(`Auction has ended. Product sold to ${f[0]} for ${displayPrice(f[1])}`)
+                            // this is the buyer and the escrow contract is yet to be created
+                            if (f[0] == web3.eth.accounts[0] && p == '0x0000000000000000000000000000000000000000') {
+                                console.log('You are the buyer, do you want to send money to the escrow?')
+                                $('#escrow-send').append('<a id="send-to-escrow" class="btn form-submit">Send amount to escrow contract!</a>')
+                                // this is the buyer and the escrow contract exists, so money can be sent from the escrow contract to the seller
+                            } else if (p == '0x0000000000000000000000000000000000000000') {
+                                $('#escrow-send').append('This product was sold, buyer has to send money to the escrow contract')
+                            }
+                            if (p != '0x0000000000000000000000000000000000000000') {
+                                j.escrowInfo.call(productId).then(function(q) {
+                                    console.log(`buyer: ${q[0]}`)
+                                    console.log(`seller: ${q[1]}`)
+                                    if (q[0] == web3.eth.accounts[0]) {
+                                        console.log('You\'ve sent money to the escrow contract, release it to the seller when you have received the product')
+                                        $('#release-funds').html('<button class="btn form-submit">Release Amount to Seller</button>')
+                                        // this is the seller and the escrow contract exists, you can send it back to the buyer
+                                    } else if (q[1] == web3.eth.accounts[0]) {
+                                        console.log('hey there seller, the money is in the escrow, do you want to send it back?')
+                                        $('#refund-funds').html('<button class="btn form-submit">Refund Amount to Buyer</button>')
+                                    }
+                                }).catch(err => console.log(err))
+                            }
+                        }).catch(err => console.log(err))
+                    }).catch(err => console.log(err))
+                    // if (q[2] == true) {
+                    //     $("#release-count").html("Amount from the escrow has been released");
+                    // }
+                    // }).catch(err => console.log(err))
                 } else if (parseInt(p[6].toLocaleString()) == 2) {
                     $("#product-status").html("Product was not sold");
                 } else {
                     console.log('nog niet verkocht')
                     $("#close-auction").show();
                 }
-            })
+            }).catch(err => console.log(err))
         }).catch(err => console.log(err))
     })
 }
-
-// funds go from escrow contract to seller
-$("#release-funds").click(function() {
-    let productId = new URLSearchParams(window.location.search).get('id');
-    Marketplace.deployed().then(function(f) {
-        $("#msg").html("Your transaction has been submitted. Please wait for few seconds for the confirmation").show();
-        console.log(productId);
-        f.releaseToSeller(productId, {
-            from: web3.eth.accounts[0],
-            gas: 440000
-        }).then(function(f) {
-            console.log(f);
-            location.reload();
-        }).catch(function(e) {
-            console.log(e);
-        })
-    });
-});
-
-// funds go from escrow contract back to buyer
-$("#refund-funds").click(function() {
-    let productId = new URLSearchParams(window.location.search).get('id');
-    Marketplace.deployed().then(function(f) {
-        $("#msg").html("Your transaction has been submitted. Please wait for few seconds for the confirmation").show();
-        f.refundToBuyer(productId, {
-            from: web3.eth.accounts[0],
-            gas: 440000
-        }).then(function(f) {
-            console.log(f);
-            location.reload();
-        }).catch(function(e) {
-            console.log(e);
-        })
-    });
-    alert("refund the funds!");
-});
 
 function renderStore() {
     renderProducts("product-list", {});
