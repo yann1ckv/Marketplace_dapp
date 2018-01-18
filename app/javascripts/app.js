@@ -100,7 +100,31 @@ window.App = {
                 })
             });
             event.preventDefault();
-        });
+        })
+
+        $("#escrow-send").click(function() {
+            let productId = $("#product-id").val()
+            Marketplace.deployed().then(function(i) {
+                i.getProduct.call(parseInt(productId)).then(function(p) {
+                    console.log(p[9].toLocaleString())
+                    i.sendToEscrow(parseInt(productId), {
+                        // value: p[9].toLocaleString(),
+                        from: web3.eth.accounts[0],
+                        gas: 4400000
+                    }).then(
+                        function(f) {
+                            console.log(f)
+                        }
+                    )
+                })
+                i.escrowAddresForProduct.call(parseInt(productId)).then(function(p) {
+                    web3.eth.getBalance(p, function(err, result) {
+                        console.log(p)
+                        // console.log(result.toLocaleString())
+                    })
+                })
+            })
+        })
 
         if ($("#product-details").length > 0) {
             //This is product details page
@@ -146,27 +170,36 @@ function renderProductDetails(productId) {
         Marketplace.deployed().then(function(j) {
             j.getProduct.call(productId).then(function(p) {
                 if (parseInt(p[6].toLocaleString()) == 1) {
-                    Marketplace.deployed().then(function(i) {
-                        i.highestBidderInfo.call(productId).then(function(f) {
-                            $("#escrow-info").html(`Auction has ended. Product sold to ${f[0]} for ${displayPrice(f[1])}`)
-                        })
-                        i.escrowInfo.call(productId).then(function(q) {
-                            console.log(q)
-                            $("#buyer").html('Buyer: ' + q[0]);
-                            $("#seller").html('Seller: ' + q[1]);
-                            if (q[2] == false) {
-                                if (q[0] == web3.eth.accounts[0]) {
-                                    console.log('you are the buyer and you\'ve bought the product, now it\'s time to pay up!')
-                                } else {
-                                    console.log('you are the seller!')
-                                }
-                            }
+                    j.highestBidderInfo.call(productId).then(function(f) {
+                        $("#escrow-info").html(`Auction has ended. Product sold to ${f[0]} for ${displayPrice(f[1])}`)
+                        if (f[0] == web3.eth.accounts[0]) {
+                            console.log('You are the buyer, do you want to send money to the escrow?')
+                            $('#escrow-send').append('<a id="send-to-escrow" class="btn form-submit">Send amount to escrow contract!</a>')
+                        }
+                    })
 
-                            if (q[2] == true) {
-                                $("#release-count").html("Amount from the escrow has been released");
-                            }
-                        })
-                    }).catch(err => console.log(err))
+                        // i.escrowInfo.call(productId).then(function(q) {
+                            // console.log(q)
+                            // $("#buyer").html('Buyer: ' + q[0]);
+                            // $("#seller").html('Seller: ' + q[1]);
+                            // if (q[2] == false) {
+                            //     if (q[0] == web3.eth.accounts[0]) {
+                            //         console.log('you are the buyer and you\'ve bought the product, now it\'s time to pay up!')
+                            //         $('#escrow-send').append('<a id="send-to-escrow" class="btn form-submit">Send amount to escrow contract!</a>')
+                            //     }
+                            //     // if (q[0] == web3.eth.accounts[0]) {
+                            //     //     console.log('you are the buyer and you\'ve bought the product, now it\'s time to pay up!')
+                            //     //     $('#release-refund').html('<a id="release-funds" class="btn form-submit">Release Amount to Seller</a>')
+                            //     // } else {
+                            //     //     console.log('you are the seller!')
+                            //     //     $('#release-refund').html('<a id="refund-funds" class="btn form-submit">Refund Amount to Buyer</a>')
+                            //     // }
+                            // }
+                            //
+                            // if (q[2] == true) {
+                            //     $("#release-count").html("Amount from the escrow has been released");
+                            // }
+                        // }).catch(err => console.log(err))
                 } else if (parseInt(p[6].toLocaleString()) == 2) {
                     $("#product-status").html("Product was not sold");
                 } else {
@@ -174,7 +207,7 @@ function renderProductDetails(productId) {
                     $("#close-auction").show();
                 }
             })
-        })
+        }).catch(err => console.log(err))
     })
 }
 

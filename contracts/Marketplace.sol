@@ -124,22 +124,22 @@ contract Marketplace {
         if (product.totalBids == 0) {
             product.status = ProductStatus.Unsold;
         } else {
-            /* Create new escrow contract */
-            Escrow escrow = (new Escrow).value(product.highestBid)(_productId, product.highestBidder, msg.sender);
-
-            /* Link the escrow contract to the product */
-            productEscrow[_productId] = address(escrow);
             product.status = ProductStatus.Sold;
 
         }
     }
 
-    function sendToEscrow(uint _productId) {
+    /* if you are the buyer and highestbidder and the contract has been closed, you send the money to the escrow */
+    function sendToEscrow(uint _productId) public {
         Product memory product = stores[productIdInStore[_productId]][_productId];
 
+        var contractOwner = productIdInStore[_productId];
+
         require(product.highestBidder == msg.sender);
+        require(product.status == ProductStatus.Sold);
 
-
+        Escrow escrow = (new Escrow).value(product.highestBid)(_productId, msg.sender, contractOwner);
+        productEscrow[_productId] = address(escrow);
     }
 
     /* get the escrow contract address for a product */
@@ -160,16 +160,5 @@ contract Marketplace {
     /* refund the funds in the escrow contract to the buyer */
     function refundToBuyer(uint _productId) public {
         Escrow(productEscrow[_productId]).refundToBuyer(msg.sender);
-    }
-
-    function stringToUint(string s) private pure returns (uint) {
-        bytes memory b = bytes(s);
-        uint result = 0;
-        for (uint i = 0; i < b.length; i++) {
-            if (b[i] >= 48 && b[i] <= 57) {
-                result = result * 10 + (uint(b[i]) - 48);
-            }
-        }
-        return result;
     }
 }
