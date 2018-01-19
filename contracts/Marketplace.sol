@@ -133,12 +133,12 @@ contract Marketplace {
     function sendToEscrow(uint _productId) public payable {
         Product memory product = stores[productIdInStore[_productId]][_productId];
 
-        var contractOwner = productIdInStore[_productId];
+        var seller = productIdInStore[_productId];
 
         require(product.highestBidder == msg.sender);
         require(product.status == ProductStatus.Sold);
 
-        Escrow escrow = (new Escrow).value(msg.value)(_productId, msg.sender, contractOwner);
+        Escrow escrow = (new Escrow).value(msg.value)(_productId, msg.sender, seller);
         productEscrow[_productId] = address(escrow);
     }
 
@@ -154,11 +154,11 @@ contract Marketplace {
 
     /* give the funds in the escrow contract to the seller */
     function releaseToSeller(uint _productId) public {
-        Escrow(productEscrow[_productId]).releaseToSeller(msg.sender);
+        Escrow(productEscrow[_productId]).releaseToSeller();
     }
 
     /* refund the funds in the escrow contract to the buyer */
     function refundToBuyer(uint _productId) public {
-        Escrow(productEscrow[_productId]).refundToBuyer(msg.sender);
+        Escrow(productEscrow[_productId]).refundToBuyer();
     }
 }
