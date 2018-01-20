@@ -60,7 +60,7 @@ window.App = {
         $("#bidding").submit(function(event) {
             $("#msg").hide();
             let amount = $("#bid-amount").val()
-            let productId = $("#product-id").val()
+            let productId = new URLSearchParams(window.location.search).get('product-id')
             // insert bid into contract
             console.log(amount + ' for ' + productId + ' by ' + web3.eth.accounts[0])
             Marketplace.deployed().then(function(i) {
@@ -81,7 +81,7 @@ window.App = {
 
         $("#close-auction").submit(function(event) {
             $("#msg").hide()
-            let productId = $("#product-id").val()
+            let productId = new URLSearchParams(window.location.search).get('product-id')
             Marketplace.deployed().then(function(i) {
                 i.closeAuction(parseInt(productId), {
                     from: web3.eth.accounts[0],
@@ -103,11 +103,10 @@ window.App = {
         })
 
         $("#escrow-send").click(function() {
-            let productId = $("#product-id").val()
+            let productId = new URLSearchParams(window.location.search).get('product-id')
             Marketplace.deployed().then(function(i) {
                 i.getProduct.call(parseInt(productId)).then(function(p) {
                     let bid = p[9].toLocaleString()
-                    console.log(bid)
                     i.sendToEscrow(parseInt(productId), {
                         value: bid,
                         from: web3.eth.accounts[0],
@@ -131,7 +130,7 @@ window.App = {
         // funds go from escrow contract to seller
         $("#release-funds").click(function() {
             console.log('release')
-            let productId = new URLSearchParams(window.location.search).get('id')
+            let productId = new URLSearchParams(window.location.search).get('product-id')
             Marketplace.deployed().then(function(f) {
                 $("#msg").html("Your transaction has been submitted. Please wait for few seconds for the confirmation").show()
                 f.releaseToSeller(parseInt(productId), {
@@ -149,7 +148,7 @@ window.App = {
         // funds go from escrow contract back to buyer
         $("#refund-funds").click(function() {
             console.log('refund')
-            let productId = new URLSearchParams(window.location.search).get('id')
+            let productId = new URLSearchParams(window.location.search).get('product-id')
             Marketplace.deployed().then(function(f) {
                 $("#msg").html("Your transaction has been submitted. Please wait for few seconds for the confirmation").show()
                 f.refundToBuyer(parseInt(productId), {
