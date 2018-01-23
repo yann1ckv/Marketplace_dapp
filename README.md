@@ -2,7 +2,7 @@
 
 # Marketplace_dapp
 
-Simple decentralized auctioning website on the Ethereum Blockchain. An agreement to sell creates an obligation for the buyer to deposit ether in an escrow contract, where the money is stored untill to buyer agrees to release the money to the sellers'
+Simple decentralized auctioning website on the Ethereum Blockchain. An agreement to sell creates an obligation for the buyer to deposit ether in an escrow contract, where the money is stored until the buyer agrees to release the money to the sellers'
 account or the seller agrees to refund the money to the buyers' account.
 
 ## Site
@@ -13,16 +13,18 @@ The user should be logged in using MetaMask. He or she then has the ability to e
 
 ![alt text](https://github.com/yvisbeek/Marketplace_dapp/blob/master/img/gif1.gif "Gif 1")
 
+
 It is also possible to make bids on already listed items.
 
 ![alt text](https://github.com/yvisbeek/Marketplace_dapp/blob/master/img/gif2.gif "Gif 2")
+
 
 After an auction is closed, the winner of the auction sends ether to an escrow account, in which it stays until either the buyer releases the funds to the seller or the seller refunds the funds to the buyer.
 
 ![alt text](https://github.com/yvisbeek/Marketplace_dapp/blob/master/img/gif4.gif "Gif 4")
 
-Once there are funds in the escrow contract, the buyer can decide to release the funds upon receiving the product.
 
+Once there are funds in the escrow contract, the buyer can decide to release the funds upon receiving the product.
 
 ![alt text](https://github.com/yvisbeek/Marketplace_dapp/blob/master/img/gif5.gif "Gif 5")
 
@@ -86,3 +88,13 @@ Open another terminal windows and start an IPFS connection
 ```
 
 The app should now be running on http://localhost:8080
+
+## Built with
+
+- [Node.js](https://nodejs.org/en/) - Node.js® is a JavaScript runtime built on Chrome's V8 JavaScript engine.
+- [IPFS](https://ipfs.io/) - A peer-to-peer hypermedia protocol to make the web faster, safer, and more open.
+- [Ethereum](https://www.ethereum.org/) - Ethereum is a decentralized platform that runs smart contracts: applications that run exactly as programmed without any possibility of downtime, censorship, fraud or third-party interference.
+- [jQuery - Ajax](http://www.w3schools.com/jquery/jquery_ref_ajax.asp) - jQuery simplifies HTML document traversing, event handling, animating, and Ajax interactions for rapid web development.
+- [Truffle Framework](http://truffleframework.com/) - Truffle is the most popular development framework for Ethereum with a mission to make your life a whole lot easier.
+- [MongoDB](https://www.mongodb.com/) - MongoDB is a document database with the scalability and flexibility that you want with the querying and indexing that you need.
+- [Ganache-cli](http://truffleframework.com/ganache/) - Quickly fire up a personal Ethereum blockchain which you can use to run tests, execute commands, and inspect state while controlling how the chain operates.
