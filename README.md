@@ -5,8 +5,28 @@
 Simple decentralized auctioning website on the Ethereum Blockchain. An agreement to sell creates an obligation for the buyer to deposit ether in an escrow contract, where the money is stored untill to buyer agrees to release the money to the sellers'
 account or the seller agrees to refund the money to the buyers' account.
 
+## Site
 
-# Installation
+#### Landing Page
+
+The user should be logged in using MetaMask. He or she then has the ability to either list a new item or view details of already listed items.
+
+![alt text](https://github.com/yvisbeek/Marketplace_dapp/blob/master/img/gif1.gif "Gif 1")
+
+It is also possible to make bids on already listed items.
+
+![alt text](https://github.com/yvisbeek/Marketplace_dapp/blob/master/img/gif2.gif "Gif 2")
+
+After an auction is closed, the winner of the auction sends ether to an escrow account, in which it stays until either the buyer releases the funds to the seller or the seller refunds the funds to the buyer.
+
+![alt text](https://github.com/yvisbeek/Marketplace_dapp/blob/master/img/gif4.gif "Gif 4")
+
+Once there are funds in the escrow contract, the buyer can decide to release the funds upon receiving the product.
+
+
+![alt text](https://github.com/yvisbeek/Marketplace_dapp/blob/master/img/gif5.gif "Gif 5")
+
+## Installation
 
 Start by cloning this repository.
 
@@ -64,3 +84,5 @@ Open another terminal windows and start an IPFS connection
 ```
 8. ipfs daemon
 ```
+
+The app should now be running on http://localhost:8080
