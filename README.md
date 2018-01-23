@@ -41,21 +41,21 @@ You will also need a working node.js setup ([instructions](https://github.com/no
 ### Install dependencies
 
 ```
-cd Marktplaats
+cd Marketplace_dapp
 npm install
 ```
 
 Install MongoDB
 
-`https://docs.mongodb.com/manual/installation/`
+`[https://docs.mongodb.com/manual/installation/](https://docs.mongodb.com/manual/installation/)`
 
 Install IPFS
 
-`https://ipfs.io/docs/install/`
+`[https://ipfs.io/docs/install/](https://ipfs.io/docs/install/)`
 
 Install the MetaMask extension for your browser
 
-`https://metamask.io/`
+`[https://metamask.io/](https://metamask.io/)`
 
 
 ## Deployment
