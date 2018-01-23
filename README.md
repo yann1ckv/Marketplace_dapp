@@ -98,3 +98,8 @@ The app should now be running on http://localhost:8080
 - [Truffle Framework](http://truffleframework.com/) - Truffle is the most popular development framework for Ethereum with a mission to make your life a whole lot easier.
 - [MongoDB](https://www.mongodb.com/) - MongoDB is a document database with the scalability and flexibility that you want with the querying and indexing that you need.
 - [Ganache-cli](http://truffleframework.com/ganache/) - Quickly fire up a personal Ethereum blockchain which you can use to run tests, execute commands, and inspect state while controlling how the chain operates.
+
+## License
+>You can check out the full license [here](https://github.com/yvisbeek/Marketplace_dapp/blob/master/LICENSE)
+
+This project is licensed under the terms of the **MIT** license.
