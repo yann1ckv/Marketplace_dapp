@@ -53,6 +53,10 @@ Install IPFS
 
 `https://ipfs.io/docs/install/`
 
+Install the MetaMask extension for your browser
+
+`https://metamask.io/`
+
 
 ## Deployment
 
