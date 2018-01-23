@@ -47,15 +47,15 @@ npm install
 
 Install MongoDB
 
-`[https://docs.mongodb.com/manual/installation/](https://docs.mongodb.com/manual/installation/)`
+`https://docs.mongodb.com/manual/installation/`
 
 Install IPFS
 
-`[https://ipfs.io/docs/install/](https://ipfs.io/docs/install/)`
+`https://ipfs.io/docs/install/`
 
 Install the MetaMask extension for your browser
 
-`[https://metamask.io/](https://metamask.io/)`
+`https://metamask.io/`
 
 
 ## Deployment
